@@ -43,6 +43,8 @@ import { Users } from "../Models/Users.model.js";
 export const PdfAdd = async (req, res) => {
   try {
     const { expiryTime, userLimit } = req.body;
+    console.log("Files received:", req.file);
+    console.log("Body:", req.body);
 
     if (!req.file) {
       return res.status(400).json({ message: "No file uploaded" });
@@ -207,7 +209,6 @@ export const addIpToPdf = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
-
 
 export const getSinglePdfData = async (req, res) => {
   try {
