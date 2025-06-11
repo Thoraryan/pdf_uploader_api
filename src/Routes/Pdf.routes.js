@@ -7,14 +7,14 @@ import {
   addIpToPdf,
   getSinglePdfData,
 } from "../Controllers/Pdf.controller.js";
-import { upload } from "../Middlewares/multer.middleware.js";
+import { uploadPdf  } from "../Middlewares/multer.middleware.js";
 import multer from "multer";
 const formate = multer();
 
 const router = Router();
 
 // POST: Upload PDF with metadata
-router.post("/upload", upload, PdfAdd);
+router.post("/upload", uploadPdf , PdfAdd);
 router.get("/view", PdfView);
 router.put("/add-ip/:id", formate.none(), addIpToPdf);
 router.delete("/delete/:id", deletePdfById);
