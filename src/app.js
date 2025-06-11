@@ -12,27 +12,10 @@ dotenv.config();
 
 app.set('trust proxy', true);
 
-// app.use(cors({
-//     origin: process.env.CORS_ORIGIN,
-//     credentials: true
-// }))
-const allowedOrigins = [
-    'http://localhost:5173',
-    'http://13.232.77.211:8080',
-];
-
 app.use(cors({
-    origin: function (origin, callback) {
-        // Allow requests with no origin (like mobile apps or curl)
-        if (!origin || allowedOrigins.includes(origin)) {
-            callback(null, true);
-        } else {
-            callback(new Error('Not allowed by CORS'));
-        }
-    },
+    origin: process.env.CORS_ORIGIN,
     credentials: true
-}));
-
+}))
 
 app.use(express.json({ limit: "2mb" }))
 
