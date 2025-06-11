@@ -1,18 +1,28 @@
 import multer from "multer";
 import path from "path";
+import { fileURLToPath } from "url";
+import fs from "fs";
 
-// Storage configuration
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const uploadPath = path.join(__dirname, "../public/uploads");
+
+// Ensure the folder exists
+if (!fs.existsSync(uploadPath)) {
+  fs.mkdirSync(uploadPath, { recursive: true });
+}
+
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, "public/uploads/");
+    cb(null, uploadPath);
   },
   filename: function (req, file, cb) {
     const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-    cb(null, uniqueSuffix + path.extname(file.originalname)); // Keep original .pdf extension
+    cb(null, uniqueSuffix + path.extname(file.originalname));
   },
 });
 
-// File filter: allow only PDFs
 const fileFilter = (req, file, cb) => {
   if (file.mimetype === "application/pdf") {
     cb(null, true);
