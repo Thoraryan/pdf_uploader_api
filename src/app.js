@@ -24,8 +24,8 @@ app.use(express.urlencoded({
     limit: "16kb"
 }))
 // app.use(express.static("public"))
-// app.use("/public", express.static("public"));
-app.use("/uploads", express.static("public/uploads"));
+app.use("/public", express.static("public"));
+// app.use("/uploads", express.static("public/uploads"));
 app.use(cookieParser())
 
 app.use("/api/v1/pdf", PdfRouter);
