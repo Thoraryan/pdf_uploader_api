@@ -10,7 +10,7 @@ const app = express();
 
 dotenv.config();
 
-app.set('trust proxy', true);
+// app.set('trust proxy', true);
 
 app.use(cors({
     origin: process.env.CORS_ORIGIN,
@@ -23,7 +23,9 @@ app.use(express.urlencoded({
     extended: true,
     limit: "16kb"
 }))
-app.use(express.static("public"))
+// app.use(express.static("public"))
+// app.use("/public", express.static("public"));
+app.use("/uploads", express.static("public/uploads"));
 app.use(cookieParser())
 
 app.use("/api/v1/pdf", PdfRouter);

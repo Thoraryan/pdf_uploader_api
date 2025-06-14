@@ -54,9 +54,11 @@ export const PdfAdd = async (req, res) => {
 
     const filePath = `/uploads/${req.file.filename}`;
 
+    const expiryUTC = new Date(expiryTime);
+
     const newPdf = new Pdf({
       filePath,
-      expiryTime,
+      expiryTime:expiryUTC,
       userLimit,
       uploadedBy: req.user?._id || null,
     });
