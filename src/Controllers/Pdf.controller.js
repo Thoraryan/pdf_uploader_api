@@ -1,5 +1,8 @@
 import { Pdf } from "../Models/Pdf.model.js";
 import { Users } from "../Models/Users.model.js";
+import { dirname } from "path";
+import path from "path";
+import { fileURLToPath } from "url";
 
 // Add PDF Controller
 // export const PdfAdd = async (req, res) => {
@@ -58,7 +61,7 @@ export const PdfAdd = async (req, res) => {
 
     const newPdf = new Pdf({
       filePath,
-      expiryTime:expiryUTC,
+      expiryTime: expiryUTC,
       userLimit,
       uploadedBy: req.user?._id || null,
     });
@@ -266,4 +269,27 @@ export const PdfView = async (req, res) => {
       error: error.message,
     });
   }
+};
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+export const PdfDirect = async (req, res) => {
+  const { id } = req.params;
+
+  const doc = await Pdf.findById(id);
+  if (!doc) return res.status(404).send("Not found");
+
+  // Go from src/controllers to project root, then into public
+  const filePath = path.join(__dirname, "..", "..", "public", doc.filePath);
+
+  console.log("📁 File path:", filePath);
+
+  res.setHeader("Content-Type", "application/pdf");
+  res.sendFile(filePath, (err) => {
+    if (err) {
+      console.error("❌ Error sending file:", err);
+      res.status(500).send("Failed to send PDF");
+    }
+  });
 };

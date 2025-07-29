@@ -6,6 +6,7 @@ import {
   accessPdfByUser,
   addIpToPdf,
   getSinglePdfData,
+  PdfDirect,
 } from "../Controllers/Pdf.controller.js";
 import { upload } from "../Middlewares/multer.middleware.js";
 import multer from "multer";
@@ -22,8 +23,11 @@ router.post("/access/:pdfId", accessPdfByUser);
 router.post("/view-one/:id", getSinglePdfData);
 router.get("/ip", (req, res) => {
   console.log("HEADERS:", req.headers);
-  const ip = req.headers["x-forwarded-for"]?.split(",")[0] || req.socket.remoteAddress;
+  const ip =
+    req.headers["x-forwarded-for"]?.split(",")[0] || req.socket.remoteAddress;
   res.json({ ip });
 });
+
+router.get("/direct/:id", formate.none(),PdfDirect);
 
 export default router;
