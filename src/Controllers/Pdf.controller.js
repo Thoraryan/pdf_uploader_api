@@ -1,8 +1,8 @@
 import { Pdf } from "../Models/Pdf.model.js";
 import { Users } from "../Models/Users.model.js";
 import { dirname } from "path";
-import path from "path";
-import { fileURLToPath } from "url";
+import requestIp from "request-ip";
+
 
 // Add PDF Controller
 // export const PdfAdd = async (req, res) => {
@@ -274,19 +274,60 @@ export const PdfView = async (req, res) => {
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
+// export const PdfDirect = async (req, res) => {
+//   const { id } = req.params;
+
+//   const doc = await Pdf.findById(id);
+//   if (!doc) return res.status(404).send("Not found");
+
+//   // Go from src/controllers to project root, then into public
+//   const filePath = path.join(__dirname, "..", "..", "public", doc.filePath);
+
+//   console.log("📁 File path:", filePath);
+
+//   res.setHeader("Content-Type", "application/pdf");
+//   res.sendFile(filePath, (err) => {
+//     if (err) {
+//       console.error("❌ Error sending file:", err);
+//       res.status(500).send("Failed to send PDF");
+//     }
+//   });
+// };
+
+
 export const PdfDirect = async (req, res) => {
   const { id } = req.params;
+  const deviceId = req.query.deviceId || "unknown";
+  const ip = requestIp.getClientIp(req);
 
   const doc = await Pdf.findById(id);
-  if (!doc) return res.status(404).send("Not found");
+  if (!doc) return res.status(404).send("PDF not found");
 
-  // Go from src/controllers to project root, then into public
+  // Check expiry
+  if (doc.expiryTime && new Date() > doc.expiryTime) {
+    return res.status(403).send("PDF link has expired");
+  }
+
+  // Restrict to specific IPs if set
+  if (doc.ipAddresses.length > 0 && !doc.ipAddresses.includes(ip)) {
+    return res.status(403).send("Access denied from this IP");
+  }
+
+  // Count unique views
+  const existingAccess = doc.accessList.find(a => a.deviceId === deviceId || a.ip === ip);
+  if (!existingAccess) {
+    if (doc.accessList.length >= doc.userLimit) {
+      return res.status(403).send("View limit exceeded");
+    }
+
+    doc.accessList.push({ ip, deviceId, accessedAt: new Date() });
+    await doc.save();
+  }
+
+  // Serve PDF
   const filePath = path.join(__dirname, "..", "..", "public", doc.filePath);
-
-  console.log("📁 File path:", filePath);
-
   res.setHeader("Content-Type", "application/pdf");
-  res.sendFile(filePath, (err) => {
+  res.sendFile(filePath, err => {
     if (err) {
       console.error("❌ Error sending file:", err);
       res.status(500).send("Failed to send PDF");
