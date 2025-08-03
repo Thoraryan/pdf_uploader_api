@@ -1,9 +1,10 @@
-import { fileURLToPath } from "url";
-import { dirname } from "path";
-import path from "path";
+import { fileURLToPath } from 'url';
+import path from 'path'; // ✅ use 'import' instead of require
+import { dirname } from 'path'; // ✅ this is needed
 import requestIp from "request-ip";
 import { Pdf } from "../Models/Pdf.model.js";
 import { Users } from "../Models/Users.model.js";
+
 
 // Add PDF Controller
 // export const PdfAdd = async (req, res) => {
