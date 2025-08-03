@@ -1,8 +1,9 @@
 import { Pdf } from "../Models/Pdf.model.js";
-import { Users } from "../Models/Users.model.js";
 import { dirname } from "path";
+import path from "path"; // ✅ Add this line
+import { fileURLToPath } from "url";
 import requestIp from "request-ip";
-
+import { Users } from "../Models/Users.model.js";
 
 // Add PDF Controller
 // export const PdfAdd = async (req, res) => {
@@ -271,9 +272,6 @@ export const PdfView = async (req, res) => {
   }
 };
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
 // export const PdfDirect = async (req, res) => {
 //   const { id } = req.params;
 
@@ -294,40 +292,49 @@ const __dirname = dirname(__filename);
 //   });
 // };
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 export const PdfDirect = async (req, res) => {
   const { id } = req.params;
   const deviceId = req.query.deviceId || "unknown";
-  const ip = requestIp.getClientIp(req);
+  const ip = requestIp.getClientIp(req) || "unknown";
+
+  console.log("👉 ID:", id);
+  console.log("📱 Device ID:", deviceId);
+  console.log("📡 IP:", ip);
 
   const doc = await Pdf.findById(id);
   if (!doc) return res.status(404).send("PDF not found");
 
-  // Check expiry
   if (doc.expiryTime && new Date() > doc.expiryTime) {
     return res.status(403).send("PDF link has expired");
   }
 
-  // Restrict to specific IPs if set
   if (doc.ipAddresses.length > 0 && !doc.ipAddresses.includes(ip)) {
     return res.status(403).send("Access denied from this IP");
   }
 
-  // Count unique views
-  const existingAccess = doc.accessList.find(a => a.deviceId === deviceId || a.ip === ip);
+  const existingAccess = doc.accessList.find(
+    (a) => a.deviceId === deviceId && a.ip === ip
+  );
+
   if (!existingAccess) {
     if (doc.accessList.length >= doc.userLimit) {
-      return res.status(403).send("View limit exceeded");
+      return res.status(403).send("User limit exceeded");
     }
 
     doc.accessList.push({ ip, deviceId, accessedAt: new Date() });
     await doc.save();
+  } else {
+    // Optional: update accessedAt if re-opening
+    existingAccess.accessedAt = new Date();
+    await doc.save();
   }
 
-  // Serve PDF
   const filePath = path.join(__dirname, "..", "..", "public", doc.filePath);
   res.setHeader("Content-Type", "application/pdf");
-  res.sendFile(filePath, err => {
+  res.sendFile(filePath, (err) => {
     if (err) {
       console.error("❌ Error sending file:", err);
       res.status(500).send("Failed to send PDF");
