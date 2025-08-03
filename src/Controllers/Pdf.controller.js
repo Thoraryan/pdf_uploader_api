@@ -5,7 +5,7 @@ import { Pdf } from "../Models/Pdf.model.js";
 import { Users } from "../Models/Users.model.js";
 
 const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const __dirname = dirname(__filename);
 
 export const PdfDirect = async (req, res) => {
   const { id } = req.params;
