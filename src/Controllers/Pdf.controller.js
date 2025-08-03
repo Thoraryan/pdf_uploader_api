@@ -1,5 +1,5 @@
-const { fileURLToPath } = require('url');
-import path from 'path'; // ✅ use 'import' instead of require
+// const { fileURLToPath } = require('url');
+import { dirname } from "path"; // ✅ use 'import' instead of require
 import requestIp from "request-ip";
 import { Pdf } from "../Models/Pdf.model.js";
 import { Users } from "../Models/Users.model.js";
