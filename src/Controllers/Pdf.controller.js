@@ -1,8 +1,8 @@
-import { Pdf } from "../Models/Pdf.model.js";
-import { dirname } from "path";
-import path from "path"; // ✅ Add this line
 import { fileURLToPath } from "url";
+import { dirname } from "path";
+import path from "path";
 import requestIp from "request-ip";
+import { Pdf } from "../Models/Pdf.model.js";
 import { Users } from "../Models/Users.model.js";
 
 // Add PDF Controller
