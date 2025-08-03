@@ -333,6 +333,7 @@ export const PdfDirect = async (req, res) => {
   }
 
   const filePath = path.join(__dirname, "..", "..", "public", doc.filePath);
+  console.log("📄 Sending file from:", filePath);
   res.setHeader("Content-Type", "application/pdf");
   res.sendFile(filePath, (err) => {
     if (err) {
