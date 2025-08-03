@@ -1,6 +1,6 @@
-import { fileURLToPath } from 'url';
-import path from 'path'; // ✅ use 'import' instead of require
-import { dirname } from 'path'; // ✅ this is needed
+// import { fileURLToPath } from 'url';
+// import path from 'path'; // ✅ use 'import' instead of require
+// import { dirname } from 'path'; // ✅ this is needed
 import requestIp from "request-ip";
 import { Pdf } from "../Models/Pdf.model.js";
 import { Users } from "../Models/Users.model.js";
@@ -293,53 +293,53 @@ export const PdfView = async (req, res) => {
 //   });
 // };
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+// const __filename = fileURLToPath(import.meta.url);
+// const __dirname = dirname(__filename);
 
-export const PdfDirect = async (req, res) => {
-  const { id } = req.params;
-  const deviceId = req.query.deviceId || "unknown";
-  const ip = requestIp.getClientIp(req) || "unknown";
+// export const PdfDirect = async (req, res) => {
+//   const { id } = req.params;
+//   const deviceId = req.query.deviceId || "unknown";
+//   const ip = requestIp.getClientIp(req) || "unknown";
 
-  console.log("👉 ID:", id);
-  console.log("📱 Device ID:", deviceId);
-  console.log("📡 IP:", ip);
+//   console.log("👉 ID:", id);
+//   console.log("📱 Device ID:", deviceId);
+//   console.log("📡 IP:", ip);
 
-  const doc = await Pdf.findById(id);
-  if (!doc) return res.status(404).send("PDF not found");
+//   const doc = await Pdf.findById(id);
+//   if (!doc) return res.status(404).send("PDF not found");
 
-  if (doc.expiryTime && new Date() > doc.expiryTime) {
-    return res.status(403).send("PDF link has expired");
-  }
+//   if (doc.expiryTime && new Date() > doc.expiryTime) {
+//     return res.status(403).send("PDF link has expired");
+//   }
 
-  if (doc.ipAddresses.length > 0 && !doc.ipAddresses.includes(ip)) {
-    return res.status(403).send("Access denied from this IP");
-  }
+//   if (doc.ipAddresses.length > 0 && !doc.ipAddresses.includes(ip)) {
+//     return res.status(403).send("Access denied from this IP");
+//   }
 
-  const existingAccess = doc.accessList.find(
-    (a) => a.deviceId === deviceId && a.ip === ip
-  );
+//   const existingAccess = doc.accessList.find(
+//     (a) => a.deviceId === deviceId && a.ip === ip
+//   );
 
-  if (!existingAccess) {
-    if (doc.accessList.length >= doc.userLimit) {
-      return res.status(403).send("User limit exceeded");
-    }
+//   if (!existingAccess) {
+//     if (doc.accessList.length >= doc.userLimit) {
+//       return res.status(403).send("User limit exceeded");
+//     }
 
-    doc.accessList.push({ ip, deviceId, accessedAt: new Date() });
-    await doc.save();
-  } else {
-    // Optional: update accessedAt if re-opening
-    existingAccess.accessedAt = new Date();
-    await doc.save();
-  }
+//     doc.accessList.push({ ip, deviceId, accessedAt: new Date() });
+//     await doc.save();
+//   } else {
+//     // Optional: update accessedAt if re-opening
+//     existingAccess.accessedAt = new Date();
+//     await doc.save();
+//   }
 
-  const filePath = path.join(__dirname, "..", "..", "public", doc.filePath);
-  console.log("📄 Sending file from:", filePath);
-  res.setHeader("Content-Type", "application/pdf");
-  res.sendFile(filePath, (err) => {
-    if (err) {
-      console.error("❌ Error sending file:", err);
-      res.status(500).send("Failed to send PDF");
-    }
-  });
-};
+//   const filePath = path.join(__dirname, "..", "..", "public", doc.filePath);
+//   console.log("📄 Sending file from:", filePath);
+//   res.setHeader("Content-Type", "application/pdf");
+//   res.sendFile(filePath, (err) => {
+//     if (err) {
+//       console.error("❌ Error sending file:", err);
+//       res.status(500).send("Failed to send PDF");
+//     }
+//   });
+// };
